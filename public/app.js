@@ -4,6 +4,7 @@ const clearSavedButton = document.getElementById("clearSavedButton");
 const resultsEl = document.getElementById("results");
 const savedEventsEl = document.getElementById("savedEvents");
 const resultCountEl = document.getElementById("resultCount");
+const appBannerEl = document.getElementById("appBanner");
 
 const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
@@ -64,6 +65,7 @@ async function searchEvents() {
       `${events.length} event${events.length === 1 ? "" : "s"}`;
 
     renderResults(events, googleFallbackLinks);
+    renderAppBanner();
   } catch (error) {
     console.error(error);
     resultsEl.innerHTML =
@@ -115,6 +117,50 @@ function googleFallbackSection(links) {
           .join("")}
       </div>
     </article>
+  `;
+}
+
+function renderAppBanner() {
+  if (!appBannerEl) return;
+
+  appBannerEl.innerHTML = `
+    <section class="apps-banner">
+      <div class="apps-banner-header">
+        <div>
+          <h2>More from The Green Portfolio</h2>
+          <p>Explore more simple apps made for everyday fun and activity.</p>
+        </div>
+      </div>
+
+      <div class="apps-grid">
+        <a class="app-card" href="https://apps.apple.com/app/bike-ride-green/id6748078701" target="_blank" rel="noopener">
+          <div class="app-icon">
+    <img src="images/bike-ride-green.png" alt="Bike Ride Green app icon">
+    </div>
+          <h3>Bike Ride Green</h3>
+          <span>Track rides, progress, and personal cycling history.</span>
+          <strong>View on App Store</strong>
+        </a>
+
+        <a class="app-card" href="https://apps.apple.com/app/trivia-maze/id6757496312" target="_blank" rel="noopener">
+          <div class="app-icon">
+    <img src="images/trivia-maze.png" alt="Trivia Maze app icon">
+    </div>
+          <h3>Trivia Maze</h3>
+          <span>Trivia meets maze gameplay with solo and party modes.</span>
+          <strong>View on App Store</strong>
+        </a>
+
+        <a class="app-card" href="https://apps.apple.com/app/goal-goal-goal/id6756977094" target="_blank" rel="noopener">
+          <div class="app-icon">
+    <img src="images/goal-goal-goal.png" alt="GOAL! GOAL! GOAL! app icon">
+    </div>
+          <h3>GOAL! GOAL! GOAL!</h3>
+          <span>A simple football game for quick casual play.</span>
+          <strong>View on App Store</strong>
+        </a>
+      </div>
+    </section>
   `;
 }
 
