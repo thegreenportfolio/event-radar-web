@@ -1,0 +1,114 @@
+import express from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.static("public"));
+
+app.get("/api/events", async (req, res) => {
+  try {
+    const {
+      countryCode = "CA",
+      city = "Calgary",
+      category = "concerts",
+      startDate,
+      endDate,
+      keyword = ""
+    } = req.query;
+
+    const apiKey = process.env.TICKETMASTER_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "Missing Ticketmaster API key. Add TICKETMASTER_API_KEY to your .env file."
+      });
+    }
+
+    const params = new URLSearchParams({
+      apikey: apiKey,
+      countryCode,
+      city,
+      size: "40",
+      sort: "date,asc"
+    });
+
+    if (keyword.trim()) {
+      params.set("keyword", keyword.trim());
+    }
+
+    if (startDate) {
+      params.set("startDateTime", `${startDate}T00:00:00Z`);
+    }
+
+    if (endDate) {
+      params.set("endDateTime", `${endDate}T23:59:59Z`);
+    }
+
+    const segmentName = ticketmasterSegmentName(category);
+
+    if (segmentName) {
+      params.set("segmentName", segmentName);
+    }
+
+    const ticketmasterUrl =
+      `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
+
+    const response = await fetch(ticketmasterUrl);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Ticketmaster error:", data);
+      return res.status(response.status).json({
+        error: "Ticketmaster search failed."
+      });
+    }
+
+    const rawEvents = data?._embedded?.events || [];
+
+    const events = rawEvents.map((event) => {
+      const venue = event?._embedded?.venues?.[0];
+
+      return {
+        id: event.id,
+        provider: "Ticketmaster",
+        title: event.name || "Untitled Event",
+        date: event.dates?.start?.localDate || "",
+        time: event.dates?.start?.localTime || "",
+        venue: venue?.name || "",
+        city: venue?.city?.name || city,
+        country: venue?.country?.countryCode || countryCode,
+        url: event.url || "",
+        image: event.images?.[0]?.url || ""
+      };
+    });
+
+    res.json({ events });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Event search failed." });
+  }
+});
+
+function ticketmasterSegmentName(category) {
+  switch (category) {
+    case "concerts":
+      return "Music";
+    case "sports":
+      return "Sports";
+    case "arts":
+      return "Arts & Theatre";
+    case "festivals":
+      return "Miscellaneous";
+    case "business":
+      return "";
+    default:
+      return "";
+  }
+}
+
+app.listen(PORT, () => {
+  console.log(`Event Radar Web running at http://localhost:${PORT}`);
+});

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Event Radar Web</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="radar-circle">
+        <div class="radar-sweep"></div>
+        <span class="dot dot-1"></span>
+        <span class="dot dot-2"></span>
+        <span class="dot dot-3"></span>
+      </div>
+
+      <h1>Event Radar</h1>
+      <p>Search events by city, category, and date. Save the ones you like and add them to your calendar.</p>
+    </section>
+
+    <section class="search-card">
+      <div class="grid">
+        <label>
+          Country
+          <select id="countryCode">
+            <option value="CA">Canada</option>
+            <option value="US">USA</option>
+            <option value="GB">United Kingdom</option>
+            <option value="IE">Ireland</option>
+            <option value="FR">France</option>
+            <option value="DE">Germany</option>
+            <option value="ES">Spain</option>
+          </select>
+        </label>
+
+        <label>
+          City
+          <input id="city" value="Calgary" />
+        </label>
+
+        <label>
+          Category
+          <select id="category">
+            <option value="concerts">Concerts</option>
+            <option value="sports">Sports</option>
+            <option value="arts">Arts</option>
+            <option value="festivals">Festivals & Community</option>
+            <option value="business">Business</option>
+          </select>
+        </label>
+
+        <label>
+          Keyword
+          <input id="keyword" placeholder="Optional" />
+        </label>
+
+        <label>
+          Start Date
+          <input id="startDate" type="date" />
+        </label>
+
+        <label>
+          End Date
+          <input id="endDate" type="date" />
+        </label>
+      </div>
+
+      <button id="searchButton">Search Events</button>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>Results</h2>
+        <span id="resultCount">0 events</span>
+      </div>
+      <div id="results" class="event-list"></div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>Saved Events</h2>
+        <button id="clearSavedButton" class="secondary-button">Clear Saved</button>
+      </div>
+      <div id="savedEvents" class="event-list"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
