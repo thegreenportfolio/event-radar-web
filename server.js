@@ -70,6 +70,7 @@ app.get("/api/events", async (req, res) => {
 
     if (!response.ok) {
       console.error("Ticketmaster error:", data);
+
       return res.status(response.status).json({
         error: "Ticketmaster search failed."
       });
@@ -94,10 +95,24 @@ app.get("/api/events", async (req, res) => {
       };
     });
 
-    res.json({ events });
+    const googleFallbackLinks = buildGoogleFallbackLinks({
+      city,
+      category,
+      startDate,
+      endDate,
+      keyword
+    });
+
+    res.json({
+      events,
+      googleFallbackLinks
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Event search failed." });
+
+    res.status(500).json({
+      error: "Event search failed."
+    });
   }
 });
 
@@ -115,6 +130,39 @@ function ticketmasterSegmentName(category) {
       return "";
     default:
       return "";
+  }
+}
+
+function buildGoogleFallbackLinks({ city, category, startDate, endDate, keyword }) {
+  const categoryText = googleCategoryText(category);
+
+  const searches = [
+    `${categoryText} events in ${city}`,
+    `${categoryText} in ${city} ${startDate || ""} ${endDate || ""}`,
+    `things to do in ${city}`,
+    keyword ? `${keyword} events in ${city}` : ""
+  ].filter(Boolean);
+
+  return searches.map((label) => ({
+    label,
+    url: `https://www.google.com/search?q=${encodeURIComponent(label)}`
+  }));
+}
+
+function googleCategoryText(category) {
+  switch (category) {
+    case "concerts":
+      return "concerts";
+    case "sports":
+      return "sports";
+    case "arts":
+      return "arts theatre comedy";
+    case "festivals":
+      return "festivals community events";
+    case "business":
+      return "business networking conferences";
+    default:
+      return "events";
   }
 }
 

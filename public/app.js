@@ -58,11 +58,12 @@ async function searchEvents() {
     }
 
     const events = data.events || [];
+    const googleFallbackLinks = data.googleFallbackLinks || [];
 
     resultCountEl.textContent =
       `${events.length} event${events.length === 1 ? "" : "s"}`;
 
-    renderResults(events);
+    renderResults(events, googleFallbackLinks);
   } catch (error) {
     console.error(error);
     resultsEl.innerHTML =
@@ -71,13 +72,22 @@ async function searchEvents() {
   }
 }
 
-function renderResults(events) {
+function renderResults(events, googleFallbackLinks = []) {
+  const shouldShowFallback = events.length < 3;
+
+  let html = "";
+
   if (events.length === 0) {
-    resultsEl.innerHTML = `<div class="empty">No events found. Try another date range or city.</div>`;
-    return;
+    html += `<div class="empty">No events found. Try another date range or city.</div>`;
+  } else {
+    html += events.map((event) => eventCard(event, false)).join("");
   }
 
-  resultsEl.innerHTML = events.map((event) => eventCard(event, false)).join("");
+  if (shouldShowFallback && googleFallbackLinks.length > 0) {
+    html += googleFallbackSection(googleFallbackLinks);
+  }
+
+  resultsEl.innerHTML = html;
 
   document.querySelectorAll("[data-save-id]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -87,6 +97,25 @@ function renderResults(events) {
   });
 
   attachCalendarButtons(events);
+}
+
+function googleFallbackSection(links) {
+  return `
+    <article class="event-card fallback-card">
+      <h3>Search More Places</h3>
+      <p>Not many results found from Ticketmaster. Try these Google searches for local event pages.</p>
+
+      <div class="event-actions">
+        ${links
+          .map((link) => `
+            <a href="${link.url}" target="_blank" rel="noopener">
+              ${escapeHtml(link.label)}
+            </a>
+          `)
+          .join("")}
+      </div>
+    </article>
+  `;
 }
 
 function eventCard(event, isSaved) {
@@ -173,7 +202,10 @@ function attachCalendarButtons(events) {
   document.querySelectorAll("[data-calendar-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const event = events.find((item) => item.id === button.dataset.calendarId);
-      downloadICS(event);
+
+      if (event) {
+        downloadICS(event);
+      }
     });
   });
 }
