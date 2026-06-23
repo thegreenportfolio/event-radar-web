@@ -133,7 +133,7 @@ function renderAppBanner() {
       </div>
 
       <div class="apps-grid">
-        <a class="app-card" href="https://apps.apple.com/app/bike-ride-green/id6748078701" target="_blank" rel="noopener">
+        <a class="app-card" href="https://apps.apple.com/app/bike-ride-green/id6753626587" target="_blank" rel="noopener">
           <div class="app-icon">
     <img src="images/bike-ride-green.png" alt="Bike Ride Green app icon">
     </div>
