@@ -22,7 +22,7 @@ app.get("/api/events", async (req, res) => {
     const {
       countryCode = "CA",
       city = "Calgary",
-      category = "concerts",
+      category = "all",
       startDate,
       endDate,
       keyword = ""
@@ -45,8 +45,10 @@ app.get("/api/events", async (req, res) => {
     });
 
     if (keyword.trim()) {
-      params.set("keyword", keyword.trim());
-    }
+  params.set("keyword", keyword.trim());
+} else if (category === "business") {
+  params.set("keyword", "business networking conference expo workshop summit");
+}
 
     if (startDate) {
       params.set("startDateTime", `${startDate}T00:00:00Z`);
@@ -78,23 +80,26 @@ app.get("/api/events", async (req, res) => {
 
     const rawEvents = data?._embedded?.events || [];
 
-    const events = rawEvents.map((event) => {
-      const venue = event?._embedded?.venues?.[0];
+let events = rawEvents.map((event) => {
+  const venue = event?._embedded?.venues?.[0];
 
-      return {
-        id: event.id,
-        provider: "Ticketmaster",
-        title: event.name || "Untitled Event",
-        date: event.dates?.start?.localDate || "",
-        time: event.dates?.start?.localTime || "",
-        venue: venue?.name || "",
-        city: venue?.city?.name || city,
-        country: venue?.country?.countryCode || countryCode,
-        url: event.url || "",
-        image: event.images?.[0]?.url || ""
-      };
-    });
+  return {
+    id: event.id,
+    provider: "Ticketmaster",
+    title: event.name || "Untitled Event",
+    date: event.dates?.start?.localDate || "",
+    time: event.dates?.start?.localTime || "",
+    venue: venue?.name || "",
+    city: venue?.city?.name || city,
+    country: venue?.country?.countryCode || countryCode,
+    url: event.url || "",
+    image: event.images?.[0]?.url || ""
+  };
+});
 
+if (category === "business") {
+  events = events.filter(isBusinessEvent);
+}
     const googleFallbackLinks = buildGoogleFallbackLinks({
       city,
       category,
@@ -118,6 +123,8 @@ app.get("/api/events", async (req, res) => {
 
 function ticketmasterSegmentName(category) {
   switch (category) {
+    case "all":
+      return "";
     case "concerts":
       return "Music";
     case "sports":
@@ -165,7 +172,36 @@ function googleCategoryText(category) {
       return "events";
   }
 }
+function isBusinessEvent(event) {
+  const text = [
+    event.title,
+    event.venue,
+    event.city
+  ]
+    .join(" ")
+    .toLowerCase();
 
+  const businessWords = [
+    "business",
+    "networking",
+    "conference",
+    "expo",
+    "summit",
+    "workshop",
+    "seminar",
+    "career",
+    "job fair",
+    "trade show",
+    "entrepreneur",
+    "startup",
+    "investment",
+    "marketing",
+    "leadership",
+    "professional"
+  ];
+
+  return businessWords.some((word) => text.includes(word));
+}
 app.listen(PORT, () => {
   console.log(`Event Radar Web running at http://localhost:${PORT}`);
 });
