@@ -12,7 +12,12 @@
 * {
   box-sizing: border-box;
 }
-
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
 body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -24,6 +29,7 @@ body {
 
 .page {
   width: min(1050px, 92%);
+  max-width: 100%;
   margin: 0 auto;
   padding: 36px 0 70px;
 }
