@@ -40,7 +40,7 @@ app.get("/api/events", async (req, res) => {
       apikey: apiKey,
       countryCode,
       city,
-      size: "40",
+      size: "150",
       sort: "date,asc"
     });
 
@@ -143,17 +143,27 @@ function ticketmasterSegmentName(category) {
 function buildGoogleFallbackLinks({ city, category, startDate, endDate, keyword }) {
   const categoryText = googleCategoryText(category);
 
-  const searches = [
-    `${categoryText} events in ${city}`,
-    `${categoryText} in ${city} ${startDate || ""} ${endDate || ""}`,
-    `things to do in ${city}`,
-    keyword ? `${keyword} events in ${city}` : ""
-  ].filter(Boolean);
+  const searches =
+    category === "all"
+      ? [
+          `events in ${city}`,
+          `things to do in ${city}`,
+          `events in ${city} ${startDate || ""} ${endDate || ""}`,
+          keyword ? `${keyword} events in ${city}` : ""
+        ]
+      : [
+          `${categoryText} events in ${city}`,
+          `${categoryText} in ${city} ${startDate || ""} ${endDate || ""}`,
+          `things to do in ${city}`,
+          keyword ? `${keyword} events in ${city}` : ""
+        ];
 
-  return searches.map((label) => ({
-    label,
-    url: `https://www.google.com/search?q=${encodeURIComponent(label)}`
-  }));
+  return searches
+    .filter(Boolean)
+    .map((label) => ({
+      label,
+      url: `https://www.google.com/search?q=${encodeURIComponent(label)}`
+    }));
 }
 
 function googleCategoryText(category) {
