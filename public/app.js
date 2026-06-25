@@ -6,8 +6,87 @@ const savedEventsEl = document.getElementById("savedEvents");
 const resultCountEl = document.getElementById("resultCount");
 const appBannerEl = document.getElementById("appBanner");
 
+const countryCodeSelect = document.getElementById("countryCode");
+const citySelect = document.getElementById("city");
+
 const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
+
+const cityOptionsByCountry = {
+  CA: [
+    "Calgary",
+    "Edmonton",
+    "Vancouver",
+    "Victoria",
+    "Toronto",
+    "Ottawa",
+    "Montreal",
+    "Quebec City",
+    "Winnipeg",
+    "Saskatoon",
+    "Regina",
+    "Halifax"
+  ],
+  US: [
+    "New York",
+    "Los Angeles",
+    "Chicago",
+    "Seattle",
+    "San Francisco",
+    "Las Vegas",
+    "Miami",
+    "Boston",
+    "Washington",
+    "Philadelphia",
+    "Dallas",
+    "Houston",
+    "Austin",
+    "Denver",
+    "Phoenix",
+    "Atlanta",
+    "Nashville"
+  ],
+  GB: [
+    "London",
+    "Manchester",
+    "Birmingham",
+    "Liverpool",
+    "Glasgow",
+    "Edinburgh",
+    "Bristol",
+    "Leeds"
+  ],
+  IE: [
+    "Dublin",
+    "Cork",
+    "Galway",
+    "Limerick"
+  ],
+  FR: [
+    "Paris",
+    "Lyon",
+    "Marseille",
+    "Nice",
+    "Toulouse",
+    "Bordeaux"
+  ],
+  DE: [
+    "Berlin",
+    "Hamburg",
+    "Munich",
+    "Cologne",
+    "Frankfurt",
+    "Dusseldorf"
+  ],
+  ES: [
+    "Madrid",
+    "Barcelona",
+    "Valencia",
+    "Seville",
+    "Malaga",
+    "Bilbao"
+  ]
+};
 
 const today = new Date();
 const nextWeek = new Date();
@@ -15,26 +94,48 @@ nextWeek.setDate(today.getDate() + 7);
 
 startDateInput.value = formatDateInput(today);
 endDateInput.value = formatDateInput(nextWeek);
+endDateInput.min = startDateInput.value;
+
+startDateInput.addEventListener("change", syncEndDateWithStartDate);
+endDateInput.addEventListener("change", syncEndDateWithStartDate);
 
 searchButton.addEventListener("click", searchEvents);
 clearSavedButton.addEventListener("click", clearSavedEvents);
+countryCodeSelect.addEventListener("change", updateCityOptions);
 
+updateCityOptions();
 renderSavedEvents();
 
 function formatDateInput(date) {
   return date.toISOString().split("T")[0];
 }
+function syncEndDateWithStartDate() {
+  endDateInput.min = startDateInput.value;
+
+  if (!endDateInput.value || endDateInput.value < startDateInput.value) {
+    const newEndDate = new Date(`${startDateInput.value}T00:00:00`);
+    newEndDate.setDate(newEndDate.getDate() + 7);
+    endDateInput.value = formatDateInput(newEndDate);
+  }
+}
+function updateCityOptions() {
+  const cities = cityOptionsByCountry[countryCodeSelect.value] || [];
+
+  citySelect.innerHTML = cities
+    .map((city) => `<option value="${escapeHtml(city)}">${escapeHtml(city)}</option>`)
+    .join("");
+}
 
 async function searchEvents() {
-  const countryCode = document.getElementById("countryCode").value;
-  const city = document.getElementById("city").value.trim();
+  const countryCode = countryCodeSelect.value;
+  const city = citySelect.value;
   const category = document.getElementById("category").value;
   const keyword = document.getElementById("keyword").value.trim();
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
 
   if (!city) {
-    resultsEl.innerHTML = `<div class="empty">Please enter a city.</div>`;
+    resultsEl.innerHTML = `<div class="empty">Please select a city.</div>`;
     return;
   }
 
@@ -94,7 +195,10 @@ function renderResults(events, googleFallbackLinks = []) {
   document.querySelectorAll("[data-save-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const event = events.find((item) => item.id === button.dataset.saveId);
-      saveEvent(event);
+
+      if (event) {
+        saveEvent(event);
+      }
     });
   });
 
@@ -135,8 +239,8 @@ function renderAppBanner() {
       <div class="apps-grid">
         <a class="app-card" href="https://apps.apple.com/app/bike-ride-green/id6753626587" target="_blank" rel="noopener">
           <div class="app-icon">
-    <img src="images/bike-ride-green.png" alt="Bike Ride Green app icon">
-    </div>
+            <img src="images/bike-ride-green.png" alt="Bike Ride Green app icon">
+          </div>
           <h3>Bike Ride Green</h3>
           <span>Track rides, progress, and personal cycling history.</span>
           <strong>View on App Store</strong>
@@ -144,8 +248,8 @@ function renderAppBanner() {
 
         <a class="app-card" href="https://apps.apple.com/app/trivia-maze/id6757496312" target="_blank" rel="noopener">
           <div class="app-icon">
-    <img src="images/trivia-maze.png" alt="Trivia Maze app icon">
-    </div>
+            <img src="images/trivia-maze.png" alt="Trivia Maze app icon">
+          </div>
           <h3>Trivia Maze</h3>
           <span>Trivia meets maze gameplay with solo and party modes.</span>
           <strong>View on App Store</strong>
@@ -153,8 +257,8 @@ function renderAppBanner() {
 
         <a class="app-card" href="https://apps.apple.com/app/goal-goal-goal/id6756977094" target="_blank" rel="noopener">
           <div class="app-icon">
-    <img src="images/goal-goal-goal.png" alt="GOAL! GOAL! GOAL! app icon">
-    </div>
+            <img src="images/goal-goal-goal.png" alt="GOAL! GOAL! GOAL! app icon">
+          </div>
           <h3>GOAL! GOAL! GOAL!</h3>
           <span>A simple football game for quick casual play.</span>
           <strong>View on App Store</strong>
@@ -204,7 +308,6 @@ function setSavedEvents(events) {
 
 function saveEvent(event) {
   const saved = getSavedEvents();
-
   const alreadySaved = saved.some((item) => item.id === event.id);
 
   if (!alreadySaved) {
