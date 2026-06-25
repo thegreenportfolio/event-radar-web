@@ -149,12 +149,23 @@ label {
 input,
 select {
   width: 100%;
+  min-width: 0;
+  height: 48px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 12px;
+  padding: 0 12px;
   background: rgba(0, 0, 0, 0.22);
   color: var(--text);
   font-size: 1rem;
+  line-height: 1.2;
+}
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select {
+  appearance: auto;
 }
 
 button {
