@@ -12,6 +12,13 @@
 * {
   box-sizing: border-box;
 }
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
 html,
 body {
   width: 100%;
@@ -323,5 +330,9 @@ button:hover {
 
   .apps-banner-header {
     display: block;
+  }
+
+  .secondary-button {
+    margin-top: 12px;
   }
 }
