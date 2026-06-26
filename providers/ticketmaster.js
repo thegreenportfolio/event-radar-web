@@ -32,8 +32,9 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   const segmentName = ticketmasterSegmentName(category);
 
   if (segmentName) {
-    params.set("segmentName", segmentName);
-  }
+  params.set("segmentName", segmentName);
+  params.set("classificationName", segmentName);
+}
 
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
 
