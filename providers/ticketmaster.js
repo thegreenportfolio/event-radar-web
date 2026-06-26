@@ -52,17 +52,20 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
       const venue = event?._embedded?.venues?.[0];
 
       return {
-        id: `ticketmaster-${event.id}`,
-        provider: "Ticketmaster",
-        title: event.name || "Untitled Event",
-        date: event.dates?.start?.localDate || "",
-        time: event.dates?.start?.localTime || "",
-        venue: venue?.name || "",
-        city: venue?.city?.name || city,
-        country: venue?.country?.countryCode || countryCode,
-        url: event.url || "",
-        image: event.images?.[0]?.url || ""
-      };
+  id: `ticketmaster-${event.id}`,
+  provider: "Ticketmaster",
+  title: event.name || "Untitled Event",
+  date: event.dates?.start?.localDate || "",
+  time: event.dates?.start?.localTime
+    ? event.dates.start.localTime.slice(0, 5)
+    : "",
+  venue: venue?.name || "",
+  address: venue?.address?.line1 || "",
+  city: venue?.city?.name || city,
+  country: venue?.country?.countryCode || countryCode,
+  url: event.url || "",
+  image: event.images?.[0]?.url || ""
+};
     })
     .filter((event) => {
       if (!startDate || !endDate || !event.date) {
