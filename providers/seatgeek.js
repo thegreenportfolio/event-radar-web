@@ -39,18 +39,19 @@ export async function searchSeatGeek({ countryCode, city, category, startDate, e
     return [];
   }
 
-  return (data.events || []).map((event) => ({
-    id: `seatgeek-${event.id}`,
-    provider: "SeatGeek",
-    title: event.title || "Untitled Event",
-    date: event.datetime_local ? event.datetime_local.split("T")[0] : "",
-    time: event.datetime_local ? event.datetime_local.split("T")[1] : "",
-    venue: event.venue?.name || "",
-    city: event.venue?.city || city,
-    country: countryCode,
-    url: event.url || "",
-    image: event.performers?.[0]?.image || ""
-  }));
+ return (data.events || []).map((event) => ({
+  id: `seatgeek-${event.id}`,
+  provider: "SeatGeek",
+  title: event.title || "Untitled Event",
+  date: event.datetime_local ? event.datetime_local.split("T")[0] : "",
+  time: event.datetime_local ? event.datetime_local.split("T")[1]?.slice(0, 5) : "",
+  venue: event.venue?.name || "",
+  address: event.venue?.address || "",
+  city: event.venue?.city || city,
+  country: countryCode,
+  url: event.url || "",
+  image: event.performers?.[0]?.image || ""
+}));
 }
 
 function seatGeekType(category) {
