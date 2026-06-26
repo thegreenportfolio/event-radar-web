@@ -7,18 +7,26 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   }
 
   const params = new URLSearchParams({
-    apikey: apiKey,
-    countryCode,
-    city,
-    size: "200",
-    sort: "date,asc"
-  });
+  apikey: apiKey,
+  countryCode,
+  size: "200",
+  sort: "date,asc",
+  locale: "*"
+});
 
+if (countryCode === "FR") {
+  params.set("keyword", keyword.trim() || city);
+} else {
+  params.set("city", city);
+}
+
+  if (countryCode !== "FR") {
   if (keyword.trim()) {
     params.set("keyword", keyword.trim());
   } else if (category === "business") {
     params.set("keyword", "business networking conference expo workshop summit");
   }
+}
 
   if (startDate) {
     params.set("startDateTime", `${startDate}T00:00:00Z`);
@@ -33,7 +41,6 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
 
   if (segmentName) {
   params.set("segmentName", segmentName);
-  params.set("classificationName", segmentName);
 }
 
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
