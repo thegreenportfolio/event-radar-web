@@ -14,8 +14,8 @@ export async function searchSeatGeek({ countryCode, city, category, startDate, e
     client_id: clientId,
     client_secret: clientSecret,
     "venue.city": city,
-    "datetime_utc.gte": `${safeStartDate}T00:00:00Z`,
-    "datetime_utc.lte": `${safeEndDate}T23:59:59Z`,
+    "datetime_local.gte": `${safeStartDate}T00:00:00`,
+    "datetime_local.lte": `${safeEndDate}T23:59:59`,
     per_page: "50",
     sort: "datetime_utc.asc"
   });
