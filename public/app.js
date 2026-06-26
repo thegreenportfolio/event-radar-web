@@ -354,7 +354,14 @@ function eventCard(event, isSaved) {
       <p>${escapeHtml(event.provider || "Event Provider")}</p>
       <p>${escapeHtml(dateText || "Date unavailable")}</p>
       <p>${escapeHtml(event.venue || "Venue unavailable")}</p>
-      <p>${escapeHtml(event.city || "")}, ${escapeHtml(event.country || "")}</p>
+
+${
+  event.address
+    ? `<p>${escapeHtml(event.address)}</p>`
+    : ""
+}
+
+<p>${escapeHtml(event.city || "")}, ${escapeHtml(event.country || "")}</p>
 
       <div class="event-actions">
         ${
@@ -451,7 +458,7 @@ function downloadICS(event) {
     `DTSTART:${start.icsDate}`,
     `DTEND:${formatICSDate(endDate)}`,
     `SUMMARY:${cleanICS(event.title)}`,
-    `LOCATION:${cleanICS([event.venue, event.city, event.country].filter(Boolean).join(", "))}`,
+    `LOCATION:${cleanICS([event.venue, event.address, event.city, event.country].filter(Boolean).join(", "))}`,
     `DESCRIPTION:${cleanICS(event.url || "Saved from Event Radar")}`,
     "END:VEVENT",
     "END:VCALENDAR"
