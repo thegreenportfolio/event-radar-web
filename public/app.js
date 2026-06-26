@@ -13,78 +13,109 @@ const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
 
 const cityOptionsByCountry = {
+  AU: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Canberra", "Gold Coast"],
+
+  AT: ["Vienna"],
+
+  BE: ["Brussels"],
+
   CA: [
-    "Calgary",
-    "Edmonton",
-    "Vancouver",
-    "Victoria",
-    "Toronto",
-    "Ottawa",
-    "Montreal",
-    "Quebec City",
+    "Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray",
+    "Vancouver", "Surrey", "Burnaby", "Richmond", "Victoria", "Kelowna", "Abbotsford", "Nanaimo", "Whistler",
     "Winnipeg",
-    "Saskatoon",
-    "Regina",
-    "Halifax"
+    "Saskatoon", "Regina",
+    "Toronto", "Mississauga", "Brampton", "Hamilton", "Ottawa", "London", "Kitchener", "Waterloo", "Windsor",
+    "Markham", "Vaughan", "Richmond Hill", "Oakville", "Burlington", "Oshawa", "Barrie", "Guelph", "Kingston",
+    "Niagara Falls", "St. Catharines",
+    "Montreal", "Quebec City", "Laval", "Gatineau", "Sherbrooke", "Trois-Rivières",
+    "Halifax", "Moncton", "Fredericton", "Saint John", "Charlottetown", "St. John's"
   ],
-  US: [
-    "New York",
-    "Los Angeles",
-    "Chicago",
-    "Seattle",
-    "San Francisco",
-    "Las Vegas",
-    "Miami",
-    "Boston",
-    "Washington",
-    "Philadelphia",
-    "Dallas",
-    "Houston",
-    "Austin",
-    "Denver",
-    "Phoenix",
-    "Atlanta",
-    "Nashville"
-  ],
-  GB: [
-    "London",
-    "Manchester",
-    "Birmingham",
-    "Liverpool",
-    "Glasgow",
-    "Edinburgh",
-    "Bristol",
-    "Leeds"
-  ],
-  IE: [
-    "Dublin",
-    "Cork",
-    "Galway",
-    "Limerick"
-  ],
-  FR: [
-    "Paris",
-    "Lyon",
-    "Marseille",
-    "Nice",
-    "Toulouse",
-    "Bordeaux"
-  ],
-  DE: [
-    "Berlin",
-    "Hamburg",
-    "Munich",
-    "Cologne",
-    "Frankfurt",
-    "Dusseldorf"
-  ],
+
+  CH: ["Zurich"],
+
+  CZ: ["Prague", "Brno"],
+
+  DE: ["Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt"],
+
+  DK: ["Copenhagen"],
+
   ES: [
-    "Madrid",
-    "Barcelona",
-    "Valencia",
-    "Seville",
-    "Malaga",
-    "Bilbao"
+    "Madrid", "Barcelona", "Valencia", "Seville", "Malaga", "Bilbao", "Zaragoza", "Alicante",
+    "Granada", "Cordoba", "Murcia", "Palma", "San Sebastian", "Pamplona", "Valladolid",
+    "Vigo", "A Coruña", "Santander", "Oviedo", "Gijon", "Tenerife", "Las Palmas"
+  ],
+
+  FI: ["Helsinki", "Tampere"],
+
+  FR: ["Paris", "Lyon", "Marseille", "Toulouse", "Nice"],
+
+  GB: [
+    "London", "Manchester", "Birmingham", "Liverpool", "Leeds", "Sheffield", "Bristol",
+    "Newcastle", "Nottingham", "Leicester", "Brighton", "Oxford", "Cambridge",
+    "Southampton", "Portsmouth", "Glasgow", "Edinburgh", "Aberdeen", "Dundee",
+    "Cardiff", "Swansea", "Belfast"
+  ],
+
+  IE: ["Dublin", "Cork", "Galway", "Limerick", "Waterford", "Kilkenny"],
+
+  IT: ["Rome", "Milan"],
+
+  MX: ["Mexico City", "Guadalajara", "Monterrey"],
+
+  NL: ["Amsterdam", "Rotterdam"],
+
+  NO: ["Oslo"],
+
+  NZ: ["Auckland", "Wellington", "Christchurch", "Queenstown"],
+
+  PL: ["Warsaw"],
+
+  PT: ["Lisbon"],
+
+  RO: ["Bucharest", "Cluj-Napoca", "Timișoara", "Iași", "Brașov", "Constanța"],
+
+  SE: ["Stockholm"],
+
+  US: [
+    "New York", "Buffalo", "Rochester", "Albany", "Syracuse",
+    "Newark", "Jersey City", "Atlantic City", "Camden", "Trenton",
+    "Los Angeles", "San Diego", "San Jose", "San Francisco", "Sacramento", "Fresno", "Long Beach", "Oakland",
+    "Bakersfield", "Anaheim", "Santa Ana", "Irvine", "Riverside", "Palm Springs",
+    "Chicago", "Aurora", "Naperville", "Rockford",
+    "Houston", "San Antonio", "Dallas", "Austin", "Fort Worth", "El Paso", "Arlington", "Corpus Christi", "Plano", "Frisco", "Irving",
+    "Miami", "Orlando", "Tampa", "Jacksonville", "Fort Lauderdale", "St. Petersburg", "West Palm Beach", "Tallahassee",
+    "Philadelphia", "Pittsburgh", "Allentown", "Harrisburg",
+    "Phoenix", "Tucson", "Mesa", "Scottsdale", "Tempe",
+    "Columbus", "Cleveland", "Cincinnati", "Toledo", "Dayton",
+    "Charlotte", "Raleigh", "Durham", "Greensboro", "Winston-Salem", "Asheville", "Wilmington",
+    "Atlanta", "Savannah", "Augusta", "Athens",
+    "Seattle", "Tacoma", "Spokane", "Bellevue",
+    "Denver", "Colorado Springs", "Boulder", "Fort Collins",
+    "Boston", "Cambridge", "Worcester", "Springfield",
+    "Washington",
+    "Nashville", "Memphis", "Knoxville", "Chattanooga",
+    "Detroit", "Grand Rapids", "Ann Arbor", "Lansing",
+    "Portland", "Eugene", "Salem", "Bend",
+    "Las Vegas", "Reno",
+    "Kansas City", "St. Louis", "Columbia",
+    "Baltimore", "Annapolis",
+    "Milwaukee", "Madison", "Green Bay",
+    "Minneapolis", "Saint Paul", "Duluth",
+    "New Orleans", "Baton Rouge", "Lafayette",
+    "Virginia Beach", "Richmond", "Norfolk", "Alexandria", "Charlottesville",
+    "Charleston", "Greenville", "Myrtle Beach",
+    "Indianapolis", "Fort Wayne", "South Bend",
+    "Louisville", "Lexington",
+    "Oklahoma City", "Tulsa",
+    "Birmingham", "Huntsville", "Mobile", "Montgomery",
+    "Salt Lake City", "Park City", "Provo",
+    "Albuquerque", "Santa Fe",
+    "Omaha", "Lincoln",
+    "Wichita", "Overland Park", "Topeka",
+    "Des Moines", "Cedar Rapids", "Iowa City",
+    "Little Rock", "Fayetteville",
+    "Hartford", "New Haven", "Stamford",
+    "Providence", "Manchester", "Burlington", "Boise", "Honolulu", "Anchorage"
   ]
 };
 
