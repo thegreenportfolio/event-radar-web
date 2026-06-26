@@ -39,9 +39,17 @@ app.get("/api/events", async (req, res) => {
 
     let events = mergeEvents([...ticketmasterEvents, ...seatGeekEvents]);
 
-    if (category === "business") {
-      events = events.filter(isBusinessEvent);
-    }
+if (category === "business") {
+  events = events.filter(isBusinessEvent);
+}
+
+events = events
+  .map(cleanEventTime)
+  .sort((a, b) => {
+    const first = new Date(`${a.date}T${a.time || "00:00"}`);
+    const second = new Date(`${b.date}T${b.time || "00:00"}`);
+    return first - second;
+  });
 
     const googleFallbackLinks = buildGoogleFallbackLinks({
       city,
@@ -57,7 +65,12 @@ app.get("/api/events", async (req, res) => {
     res.status(500).json({ error: "Event search failed." });
   }
 });
-
+function cleanEventTime(event) {
+  return {
+    ...event,
+    time: event.time ? event.time.slice(0, 5) : ""
+  };
+}
 function buildGoogleFallbackLinks({ city, category, startDate, endDate, keyword }) {
   const categoryText = googleCategoryText(category);
 
