@@ -74,6 +74,23 @@ body {
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.45);
 }
+.pagination {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 18px 0;
+}
+
+.pagination button {
+  margin-top: 0;
+  padding: 9px 13px;
+}
+
+.pagination .active-page {
+  background: var(--blue);
+  color: white;
+}
 
 @media (prefers-color-scheme: dark) {
   .hero {
