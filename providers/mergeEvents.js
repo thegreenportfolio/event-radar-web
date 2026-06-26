@@ -13,7 +13,11 @@ export function mergeEvents(events) {
     }
   }
 
-  return uniqueEvents;
+  return uniqueEvents.sort((a, b) => {
+    const first = `${a.date || ""}T${a.time || "00:00"}`;
+    const second = `${b.date || ""}T${b.time || "00:00"}`;
+    return first.localeCompare(second);
+  });
 }
 
 function isLikelyDuplicate(first, second) {
@@ -25,70 +29,67 @@ function isLikelyDuplicate(first, second) {
     return false;
   }
 
-  const firstTitle = normalizeTitle(first.title);
-  const secondTitle = normalizeTitle(second.title);
-
-  const firstVenue = normalizeVenue(first.venue);
-  const secondVenue = normalizeVenue(second.venue);
-
-  const sameVenue =
-    firstVenue &&
-    secondVenue &&
-    (
-      firstVenue === secondVenue ||
-      firstVenue.includes(secondVenue) ||
-      secondVenue.includes(firstVenue)
-    );
-
-  if (!sameVenue) {
-    return false;
-  }
-
   const sameTime =
     first.time &&
     second.time &&
     first.time.slice(0, 5) === second.time.slice(0, 5);
 
-  const titleScore = wordSimilarity(firstTitle, secondTitle);
-
-  if (titleScore >= 0.45) {
-    return true;
+  // If same day/place but different real hours, keep both.
+  if (!sameTime && hasRealTime(first) && hasRealTime(second)) {
+    return false;
   }
 
-  if (firstTitle.includes(secondTitle) || secondTitle.includes(firstTitle)) {
+  const sameAddress = samePlace(first.address, second.address);
+  const sameVenue = samePlace(first.venue, second.venue);
+
+  if (!sameAddress && !sameVenue) {
+    return false;
+  }
+
+  const firstTitle = normalizeTitle(first.title);
+  const secondTitle = normalizeTitle(second.title);
+  const titleScore = wordSimilarity(firstTitle, secondTitle);
+
+  if (titleScore >= 0.45) return true;
+
+  if (
+    firstTitle.length >= 4 &&
+    secondTitle.length >= 4 &&
+    (firstTitle.includes(secondTitle) || secondTitle.includes(firstTitle))
+  ) {
     return true;
   }
 
   const firstMainWord = firstTitle.split(" ")[0];
   const secondMainWord = secondTitle.split(" ")[0];
 
-  if (sameTime && firstMainWord && firstMainWord === secondMainWord) {
-    return true;
-  }
-
-  return false;
+  return sameTime && firstMainWord && firstMainWord === secondMainWord;
 }
-function betterEvent(existing, newer) {
-  const existingScore = eventScore(existing);
-  const newScore = eventScore(newer);
 
-  return newScore > existingScore ? newer : existing;
+function samePlace(first, second) {
+  const a = normalizeVenue(first);
+  const b = normalizeVenue(second);
+
+  if (!a || !b) return false;
+
+  return a === b || a.includes(b) || b.includes(a);
+}
+
+function hasRealTime(event) {
+  return event.time && !event.time.toLowerCase().includes("tba");
+}
+
+function betterEvent(existing, newer) {
+  return eventScore(newer) > eventScore(existing) ? newer : existing;
 }
 
 function eventScore(event) {
   let score = 0;
 
-  if (event.time && !event.time.toLowerCase().includes("tba")) {
-    score += 100;
-  }
-
-  if (event.url) {
-    score += 20;
-  }
-
-  if (event.provider === "Ticketmaster") {
-    score += 10;
-  }
+  if (hasRealTime(event)) score += 100;
+  if (event.address) score += 30;
+  if (event.url) score += 20;
+  if (event.provider === "Ticketmaster") score += 10;
 
   return score;
 }
@@ -125,9 +126,7 @@ function wordSimilarity(first, second) {
   const firstWords = new Set(first.split(" ").filter(Boolean));
   const secondWords = new Set(second.split(" ").filter(Boolean));
 
-  if (firstWords.size === 0 || secondWords.size === 0) {
-    return 0;
-  }
+  if (firstWords.size === 0 || secondWords.size === 0) return 0;
 
   const shared = [...firstWords].filter((word) => secondWords.has(word)).length;
   const total = new Set([...firstWords, ...secondWords]).size;
