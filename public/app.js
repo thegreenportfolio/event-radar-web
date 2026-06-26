@@ -311,6 +311,16 @@ function renderAppBanner() {
       </div>
 
       <div class="apps-grid">
+      
+      <a class="app-card" href="https://apps.apple.com/app/jobconnect/id6760315701" target="_blank" rel="noopener">
+     <div class="app-icon">
+        <img src="images/jobconnect.png" alt="JobConnect app icon">
+         </div>
+         <h3>JobConnect</h3>
+         <span>Private local hiring with approval-based matching.</span>
+        <strong>View on App Store</strong>
+    </a>
+      
         <a class="app-card" href="https://apps.apple.com/app/bike-ride-green/id6753626587" target="_blank" rel="noopener">
           <div class="app-icon">
             <img src="images/bike-ride-green.png" alt="Bike Ride Green app icon">
@@ -329,14 +339,7 @@ function renderAppBanner() {
           <strong>View on App Store</strong>
         </a>
 
-        <a class="app-card" href="https://apps.apple.com/app/goal-goal-goal/id6756977094" target="_blank" rel="noopener">
-          <div class="app-icon">
-            <img src="images/goal-goal-goal.png" alt="GOAL! GOAL! GOAL! app icon">
-          </div>
-          <h3>GOAL! GOAL! GOAL!</h3>
-          <span>A simple football game for quick casual play.</span>
-          <strong>View on App Store</strong>
-        </a>
+     
       </div>
     </section>
   `;
