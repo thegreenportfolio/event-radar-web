@@ -317,7 +317,7 @@ function renderAppBanner() {
         <img src="images/jobconnect.png" alt="JobConnect app icon">
          </div>
          <h3>JobConnect</h3>
-         <span>Private local hiring with approval-based matching.</span>
+         <span>Private local hiring with approval-based matching. Available in Canada.</span>
         <strong>View on App Store</strong>
     </a>
       
