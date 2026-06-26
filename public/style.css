@@ -1,6 +1,6 @@
 :root {
   --bg: #eef8f1;
-  --body: #f5f5f7;
+  --body: #e8fbea;
   --card: #ffffff;
   --border: #e5e5ea;
   --text: #111111;
@@ -11,12 +11,15 @@
   --red: #ff3b30;
   --soft-green: #dcfce7;
   --input-bg: #ffffff;
+  --page-gradient:
+    radial-gradient(circle at top left, #dcfce7 0, transparent 38%),
+    linear-gradient(180deg, #e8fbea 0%, #f5fff7 45%, #e8fbea 100%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #03130a;
-    --body: #000000;
+    --body: #03130a;
     --card: #1c1c1e;
     --border: #3a3a3c;
     --text: #f5f5f7;
@@ -27,6 +30,9 @@
     --red: #ff405c;
     --soft-green: #062411;
     --input-bg: #2c2c2e;
+    --page-gradient:
+      radial-gradient(circle at top left, #062411 0, transparent 40%),
+      linear-gradient(180deg, #03130a 0%, #061b0d 45%, #03130a 100%);
   }
 }
 
@@ -50,7 +56,7 @@ body {
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", sans-serif;
-  background: var(--body);
+  background: var(--page-gradient);
   color: var(--text);
 }
 
@@ -66,7 +72,13 @@ body {
   margin-bottom: 28px;
   padding: 34px 16px;
   border-radius: 30px;
-  background: radial-gradient(circle at top left, var(--soft-green), var(--bg) 45%, var(--body) 100%);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  .hero {
+    background: rgba(28, 28, 30, 0.72);
+  }
 }
 
 .hero h1 {
