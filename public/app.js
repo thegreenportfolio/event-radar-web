@@ -12,6 +12,11 @@ const citySelect = document.getElementById("city");
 const startDateInput = document.getElementById("startDate");
 const endDateInput = document.getElementById("endDate");
 
+let currentResults = [];
+let currentFallbackLinks = [];
+let currentPage = 1;
+const eventsPerPage = 20;
+
 const cityOptionsByCountry = {
   AU: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Canberra", "Gold Coast"],
 
@@ -196,7 +201,11 @@ async function searchEvents() {
     resultCountEl.textContent =
       `${events.length} event${events.length === 1 ? "" : "s"}`;
 
-    renderResults(events, googleFallbackLinks);
+    currentResults = events;
+    currentFallbackLinks = googleFallbackLinks;
+    currentPage = 1;
+
+    renderResults(currentResults, currentFallbackLinks);
     renderAppBanner();
   } catch (error) {
     console.error(error);
@@ -208,13 +217,17 @@ async function searchEvents() {
 
 function renderResults(events, googleFallbackLinks = []) {
   const shouldShowFallback = events.length < 3;
+  const startIndex = (currentPage - 1) * eventsPerPage;
+  const pageEvents = events.slice(startIndex, startIndex + eventsPerPage);
 
   let html = "";
 
   if (events.length === 0) {
     html += `<div class="empty">No events found. Try another date range or city.</div>`;
   } else {
-    html += events.map((event) => eventCard(event, false)).join("");
+    html += `<div class="empty">Showing ${startIndex + 1}-${Math.min(startIndex + eventsPerPage, events.length)} of ${events.length} events</div>`;
+    html += pageEvents.map((event) => eventCard(event, false)).join("");
+    html += paginationControls(events.length);
   }
 
   if (shouldShowFallback && googleFallbackLinks.length > 0) {
@@ -222,6 +235,14 @@ function renderResults(events, googleFallbackLinks = []) {
   }
 
   resultsEl.innerHTML = html;
+
+  document.querySelectorAll("[data-page]").forEach((button) => {
+    button.addEventListener("click", () => {
+      currentPage = Number(button.dataset.page);
+      renderResults(currentResults, currentFallbackLinks);
+      resultsEl.scrollIntoView({ behavior: "smooth" });
+    });
+  });
 
   document.querySelectorAll("[data-save-id]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -234,6 +255,28 @@ function renderResults(events, googleFallbackLinks = []) {
   });
 
   attachCalendarButtons(events);
+}
+
+function paginationControls(totalEvents) {
+  const totalPages = Math.ceil(totalEvents / eventsPerPage);
+
+  if (totalPages <= 1) return "";
+
+  return `
+    <div class="pagination">
+      ${Array.from({ length: totalPages }, (_, index) => {
+        const page = index + 1;
+
+        return `
+          <button
+            class="${page === currentPage ? "active-page" : ""}"
+            data-page="${page}">
+            ${page}
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
 }
 
 function googleFallbackSection(links) {
