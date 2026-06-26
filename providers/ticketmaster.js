@@ -21,12 +21,12 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   }
 
   if (startDate) {
-    params.set("startDateTime", `${startDate}T00:00:00`);
-  }
+  params.set("startDateTime", `${startDate}T00:00:00Z`);
+}
 
-  if (endDate) {
-    params.set("endDateTime", `${endDate}T23:59:59`);
-  }
+if (endDate) {
+  params.set("endDateTime", `${endDate}T23:59:59Z`);
+}
 
   const segmentName = ticketmasterSegmentName(category);
 
