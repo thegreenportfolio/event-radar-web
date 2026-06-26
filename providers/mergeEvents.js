@@ -32,13 +32,22 @@ function isLikelyDuplicate(first, second) {
   const secondVenue = normalizeVenue(second.venue);
 
   const sameVenue =
-    firstVenue === secondVenue ||
-    firstVenue.includes(secondVenue) ||
-    secondVenue.includes(firstVenue);
+    firstVenue &&
+    secondVenue &&
+    (
+      firstVenue === secondVenue ||
+      firstVenue.includes(secondVenue) ||
+      secondVenue.includes(firstVenue)
+    );
 
   if (!sameVenue) {
     return false;
   }
+
+  const sameTime =
+    first.time &&
+    second.time &&
+    first.time.slice(0, 5) === second.time.slice(0, 5);
 
   const titleScore = wordSimilarity(firstTitle, secondTitle);
 
@@ -50,9 +59,15 @@ function isLikelyDuplicate(first, second) {
     return true;
   }
 
+  const firstMainWord = firstTitle.split(" ")[0];
+  const secondMainWord = secondTitle.split(" ")[0];
+
+  if (sameTime && firstMainWord && firstMainWord === secondMainWord) {
+    return true;
+  }
+
   return false;
 }
-
 function betterEvent(existing, newer) {
   const existingScore = eventScore(existing);
   const newScore = eventScore(newer);
