@@ -14,18 +14,19 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   locale: "*"
 });
 
-if (countryCode === "FR") {
-  params.set("keyword", keyword.trim() || city);
-} else {
-  params.set("city", city);
-}
+const citySearchCountries = ["CA", "US", "GB"];
 
-  if (countryCode !== "FR") {
+if (citySearchCountries.includes(countryCode)) {
+  params.set("city", city);
+
   if (keyword.trim()) {
     params.set("keyword", keyword.trim());
   } else if (category === "business") {
     params.set("keyword", "business networking conference expo workshop summit");
   }
+} else {
+  params.set("locale", "*");
+  params.set("keyword", keyword.trim() || city);
 }
 
   if (startDate) {
