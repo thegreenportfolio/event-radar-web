@@ -14,7 +14,18 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   locale: "*"
 });
 
+
 const citySearchCountries = ["CA", "US", "GB"];
+
+const ticketmasterKeywordCityAliases = {
+  IT: {
+    Rome: "Roma",
+    Milan: "Milano"
+  }
+};
+
+const searchCity =
+  ticketmasterKeywordCityAliases[countryCode]?.[city] || city;
 
 if (citySearchCountries.includes(countryCode)) {
   params.set("city", city);
@@ -26,7 +37,7 @@ if (citySearchCountries.includes(countryCode)) {
   }
 } else {
   params.set("locale", "*");
-  params.set("keyword", keyword.trim() || city);
+  params.set("keyword", keyword.trim() || searchCity);
 }
 
   if (startDate) {
