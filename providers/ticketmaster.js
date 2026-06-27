@@ -7,56 +7,60 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   }
 
   const params = new URLSearchParams({
-  apikey: apiKey,
-  countryCode,
-  size: "200",
-  sort: "date,asc",
-  locale: "*"
-});
+    apikey: apiKey,
+    countryCode,
+    size: "200",
+    sort: "date,asc",
+    locale: "*"
+  });
 
+  const citySearchCountries = ["CA", "US", "GB"];
 
-const citySearchCountries = ["CA", "US", "GB"];
+  const ticketmasterKeywordCityAliases = {
+    ES: {
+      Seville: "Sevilla",
+      Cordoba: "Córdoba",
+      "A Coruña": "La Coruña",
+      Gijon: "Gijón",
+      Malaga: "Málaga",
+      "San Sebastian": "San Sebastián"
+    },
+    IT: {
+      Rome: "Roma",
+      Milan: "Milano",
+      Florence: "Firenze"
+    },
+    PT: {
+      Lisbon: "Lisboa"
+    },
+    RO: {
+      Bucharest: "Bucuresti",
+      "Cluj-Napoca": "Cluj",
+      "Timișoara": "Timisoara",
+      "Iași": "Iasi",
+      "Brașov": "Brasov",
+      "Constanța": "Constanta"
+    }
+  };
 
-const ticketmasterKeywordCityAliases = {
-  ES: {
-    Seville: "Sevilla"
-  },
-  IT: {
-    Rome: "Roma",
-    Milan: "Milano"
-  },
-  PT: {
-    Lisbon: "Lisboa"
-  },
-  RO: {
-    Bucharest: "Bucuresti",
-    "Cluj-Napoca": "Cluj",
-    "Timișoara": "Timisoara",
-    "Iași": "Iasi",
-    "Brașov": "Brasov",
-    "Constanța": "Constanta"
-  }
-};
+  const searchCity =
+    ticketmasterKeywordCityAliases[countryCode]?.[city] || city;
 
-const searchCity =
-  ticketmasterKeywordCityAliases[countryCode]?.[city] || city;
+  if (citySearchCountries.includes(countryCode)) {
+    params.set("city", city);
 
-if (citySearchCountries.includes(countryCode)) {
-  params.set("city", city);
-
-  if (keyword.trim()) {
-    params.set("keyword", keyword.trim());
-  } else if (category === "business") {
-    params.set("keyword", "business networking conference expo workshop summit");
-  }
-} else {
-  params.set("locale", "*");
-  if (category === "business" && !keyword.trim()) {
-    params.set("keyword", `${searchCity} business networking conference expo workshop summit`);
+    if (keyword.trim()) {
+      params.set("keyword", keyword.trim());
+    } else if (category === "business") {
+      params.set("keyword", "business networking conference expo workshop summit");
+    }
   } else {
-    params.set("keyword", keyword.trim() || searchCity);
+    if (category === "business" && !keyword.trim()) {
+      params.set("keyword", `${searchCity} business networking conference expo workshop summit`);
+    } else {
+      params.set("keyword", keyword.trim() || searchCity);
+    }
   }
-}
 
   if (startDate) {
     params.set("startDateTime", `${startDate}T00:00:00Z`);
@@ -70,46 +74,55 @@ if (citySearchCountries.includes(countryCode)) {
   const segmentName = ticketmasterSegmentName(category);
 
   if (segmentName) {
-  params.set("segmentName", segmentName);
-}
-
-let rawEvents = [];
-
-for (let page = 0; page < 3; page++) {
-  params.set("page", String(page));
-
-  const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("Ticketmaster error:", data);
-    continue;
+    params.set("segmentName", segmentName);
   }
 
-  rawEvents.push(...(data?._embedded?.events || []));
-}
+  let rawEvents = [];
+
+  for (let page = 0; page < 3; page++) {
+    params.set("page", String(page));
+
+    const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Ticketmaster error:", data);
+      continue;
+    }
+
+    rawEvents.push(...(data?._embedded?.events || []));
+  }
 
   return rawEvents
     .map((event) => {
       const venue = event?._embedded?.venues?.[0];
 
       return {
-  id: `ticketmaster-${event.id}`,
-  provider: "Ticketmaster",
-  title: event.name || "Untitled Event",
-  date: event.dates?.start?.localDate || "",
-  time: event.dates?.start?.localTime
-    ? event.dates.start.localTime.slice(0, 5)
-    : "",
-  venue: venue?.name || "",
-  address: venue?.address?.line1 || "",
-  city: venue?.city?.name || city,
-  country: venue?.country?.countryCode || countryCode,
-  url: event.url || "",
-  image: event.images?.[0]?.url || ""
-};
+        id: `ticketmaster-${event.id}`,
+        provider: "Ticketmaster",
+        title: event.name || "Untitled Event",
+        date: event.dates?.start?.localDate || "",
+        time: event.dates?.start?.localTime
+          ? event.dates.start.localTime.slice(0, 5)
+          : "",
+        venue: venue?.name || "",
+        address: venue?.address?.line1 || "",
+        city: venue?.city?.name || city,
+        country: venue?.country?.countryCode || countryCode,
+        url: event.url || "",
+        image: event.images?.[0]?.url || ""
+      };
+    })
+    .filter((event) => {
+      if (citySearchCountries.includes(countryCode)) {
+        return true;
+      }
+
+      return event.city
+        .toLowerCase()
+        .includes(searchCity.toLowerCase());
     })
     .filter((event) => {
       if (!startDate || !endDate || !event.date) {
