@@ -18,9 +18,23 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
 const citySearchCountries = ["CA", "US", "GB"];
 
 const ticketmasterKeywordCityAliases = {
+  ES: {
+    Seville: "Sevilla"
+  },
   IT: {
     Rome: "Roma",
     Milan: "Milano"
+  },
+  PT: {
+    Lisbon: "Lisboa"
+  },
+  RO: {
+    Bucharest: "Bucuresti",
+    "Cluj-Napoca": "Cluj",
+    "Timișoara": "Timisoara",
+    "Iași": "Iasi",
+    "Brașov": "Brasov",
+    "Constanța": "Constanta"
   }
 };
 
@@ -37,7 +51,11 @@ if (citySearchCountries.includes(countryCode)) {
   }
 } else {
   params.set("locale", "*");
-  params.set("keyword", keyword.trim() || searchCity);
+  if (category === "business" && !keyword.trim()) {
+    params.set("keyword", `${searchCity} business networking conference expo workshop summit`);
+  } else {
+    params.set("keyword", keyword.trim() || searchCity);
+  }
 }
 
   if (startDate) {
