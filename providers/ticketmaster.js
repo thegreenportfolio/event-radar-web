@@ -17,6 +17,9 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
   const citySearchCountries = ["CA", "US", "GB"];
 
   const ticketmasterKeywordCityAliases = {
+    MX: {
+      "Mexico City": "Mexico City"
+    },
     ES: {
       Seville: "Sevilla",
       Cordoba: "Córdoba",
@@ -120,9 +123,12 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
         return true;
       }
 
-      return event.city
-        .toLowerCase()
-        .includes(searchCity.toLowerCase());
+      return ticketmasterCityMatches({
+        eventCity: event.city,
+        selectedCity: city,
+        searchCity,
+        countryCode
+      });
     })
     .filter((event) => {
       if (!startDate || !endDate || !event.date) {
@@ -147,4 +153,33 @@ function addDays(dateString, days) {
   const date = new Date(`${dateString}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().split("T")[0];
+}
+
+function ticketmasterCityMatches({ eventCity, selectedCity, searchCity, countryCode }) {
+  const event = normalizeCityName(eventCity);
+  const selected = normalizeCityName(selectedCity);
+  const search = normalizeCityName(searchCity);
+
+  if (event.includes(selected) || event.includes(search)) {
+    return true;
+  }
+
+  if (countryCode === "MX" && selected === "mexico city") {
+    return [
+      "mexico",
+      "ciudad de mexico",
+      "mexico cdmx",
+      "cdmx"
+    ].includes(event);
+  }
+
+  return false;
+}
+
+function normalizeCityName(value = "") {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
