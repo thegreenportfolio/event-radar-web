@@ -73,6 +73,11 @@ if (citySearchCountries.includes(countryCode)) {
   params.set("segmentName", segmentName);
 }
 
+let rawEvents = [];
+
+for (let page = 0; page < 3; page++) {
+  params.set("page", String(page));
+
   const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
 
   const response = await fetch(url);
@@ -80,10 +85,11 @@ if (citySearchCountries.includes(countryCode)) {
 
   if (!response.ok) {
     console.error("Ticketmaster error:", data);
-    return [];
+    continue;
   }
 
-  const rawEvents = data?._embedded?.events || [];
+  rawEvents.push(...(data?._embedded?.events || []));
+}
 
   return rawEvents
     .map((event) => {
