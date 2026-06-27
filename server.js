@@ -32,9 +32,13 @@ app.get("/api/events", async (req, res) => {
       keyword = ""
     } = req.query;
 
+    const useSeatGeek = countryCode === "US" || countryCode === "CA";
+
     const [ticketmasterEvents, seatGeekEvents] = await Promise.all([
       searchTicketmaster({ countryCode, city, category, startDate, endDate, keyword }),
-      searchSeatGeek({ countryCode, city, category, startDate, endDate, keyword })
+      useSeatGeek
+        ? searchSeatGeek({ countryCode, city, category, startDate, endDate, keyword })
+        : Promise.resolve([])
     ]);
 
     let events = mergeEvents([...ticketmasterEvents, ...seatGeekEvents]);
