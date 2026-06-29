@@ -169,15 +169,6 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
     }
   }
 
-  if (startDate) {
-    params.set("startDateTime", `${startDate}T00:00:00Z`);
-  }
-
-  if (endDate) {
-    const extendedEnd = addDays(endDate, 1);
-    params.set("endDateTime", `${extendedEnd}T23:59:59Z`);
-  }
-
   const segmentName = ticketmasterSegmentName(category);
 
   if (segmentName) {
@@ -186,20 +177,41 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
 
   let rawEvents = [];
 
-  for (let page = 0; page < 3; page++) {
-    params.set("page", String(page));
+  const chunks = makeDateChunks(startDate, endDate, 7);
 
-    const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Ticketmaster error:", data);
-      continue;
+  for (const chunk of chunks) {
+    if (chunk.startDate) {
+      params.set("startDateTime", `${chunk.startDate}T00:00:00Z`);
+    } else {
+      params.delete("startDateTime");
     }
 
-    rawEvents.push(...(data?._embedded?.events || []));
+    if (chunk.endDate) {
+      params.set("endDateTime", `${chunk.endDate}T23:59:59Z`);
+    } else {
+      params.delete("endDateTime");
+    }
+
+    for (let page = 0; page < 3; page++) {
+      params.set("page", String(page));
+
+      const url = `https://app.ticketmaster.com/discovery/v2/events.json?${params.toString()}`;
+
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Ticketmaster error:", data);
+        continue;
+      }
+
+      const events = data?._embedded?.events || [];
+      rawEvents.push(...events);
+
+      if (events.length < 200) {
+        break;
+      }
+    }
   }
 
   return rawEvents
@@ -257,6 +269,36 @@ function addDays(dateString, days) {
   const date = new Date(`${dateString}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().split("T")[0];
+}
+
+function makeDateChunks(startDate, endDate, days = 7) {
+  if (!startDate || !endDate) {
+    return [{ startDate, endDate }];
+  }
+
+  const chunks = [];
+  let current = new Date(`${startDate}T00:00:00Z`);
+  const final = new Date(`${endDate}T00:00:00Z`);
+
+  while (current <= final) {
+    const chunkStart = current.toISOString().split("T")[0];
+
+    const chunkEndDate = new Date(current);
+    chunkEndDate.setUTCDate(chunkEndDate.getUTCDate() + days - 1);
+
+    if (chunkEndDate > final) {
+      chunkEndDate.setTime(final.getTime());
+    }
+
+    chunks.push({
+      startDate: chunkStart,
+      endDate: chunkEndDate.toISOString().split("T")[0]
+    });
+
+    current.setUTCDate(current.getUTCDate() + days);
+  }
+
+  return chunks;
 }
 
 function ticketmasterCityMatches({ eventCity, selectedCity, searchCity, countryCode }) {
