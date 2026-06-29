@@ -134,6 +134,19 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
       "Iași": "Iasi",
       "Brașov": "Brasov",
       "Constanța": "Constanta"
+    },
+    AE: {
+      Dubai: "Dubai",
+      "Abu Dhabi": "Abu Dhabi"
+    },
+    SG: {
+      Singapore: "Singapore"
+    },
+    ZA: {
+      Johannesburg: "Johannesburg",
+      "Cape Town": "Cape Town",
+      Durban: "Durban",
+      Pretoria: "Pretoria"
     }
   };
 
@@ -392,6 +405,19 @@ function ticketmasterCityMatchAliases({ countryCode, selectedCity, searchCity })
       "Iași": ["Iasi"],
       "Brașov": ["Brasov"],
       "Constanța": ["Constanta"]
+    },
+    AE: {
+      Dubai: ["Dubai"],
+      "Abu Dhabi": ["Abu Dhabi"]
+    },
+    SG: {
+      Singapore: ["Singapore"]
+    },
+    ZA: {
+      Johannesburg: ["Johannesburg"],
+      "Cape Town": ["Cape Town"],
+      Durban: ["Durban"],
+      Pretoria: ["Pretoria"]
     }
   };
 
