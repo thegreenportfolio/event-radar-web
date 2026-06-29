@@ -34,8 +34,11 @@ function isLikelyDuplicate(first, second) {
     second.time &&
     first.time.slice(0, 5) === second.time.slice(0, 5);
 
-  // If same day/place but different real hours, keep both.
-  if (!sameTime && hasRealTime(first) && hasRealTime(second)) {
+  const timeDifferenceMinutes = timeDifference(first.time, second.time);
+  const closeTime = timeDifferenceMinutes !== null && timeDifferenceMinutes <= 30;
+
+  // If same day but clearly different real start times, keep both.
+  if (!sameTime && !closeTime && hasRealTime(first) && hasRealTime(second)) {
     return false;
   }
 
@@ -50,15 +53,22 @@ function isLikelyDuplicate(first, second) {
   const secondTitle = normalizeTitle(second.title);
   const titleScore = wordSimilarity(firstTitle, secondTitle);
 
-  if (titleScore >= 0.45) return true;
-
-  if (
+  const titleContains =
     firstTitle.length >= 4 &&
     secondTitle.length >= 4 &&
-    (firstTitle.includes(secondTitle) || secondTitle.includes(firstTitle))
-  ) {
-    return true;
-  }
+    (firstTitle.includes(secondTitle) || secondTitle.includes(firstTitle));
+
+  // Strongest match: same date + same address + same/close start time.
+  if (sameAddress && closeTime) return true;
+
+  // Next safest: same date + same venue + same/close start time + similar show name.
+  if (sameVenue && closeTime && (titleScore >= 0.35 || titleContains)) return true;
+
+  // Backup: exact same time + same address + similar show name.
+  if (sameAddress && sameTime && (titleScore >= 0.35 || titleContains)) return true;
+
+  // Backup: exact same time + same venue + stronger show name match.
+  if (sameVenue && sameTime && (titleScore >= 0.45 || titleContains)) return true;
 
   const firstMainWord = firstTitle.split(" ")[0];
   const secondMainWord = secondTitle.split(" ")[0];
@@ -77,6 +87,24 @@ function samePlace(first, second) {
 
 function hasRealTime(event) {
   return event.time && !event.time.toLowerCase().includes("tba");
+}
+
+function timeDifference(first, second) {
+  if (!first || !second) return null;
+
+  const [firstHour, firstMinute] = first.slice(0, 5).split(":").map(Number);
+  const [secondHour, secondMinute] = second.slice(0, 5).split(":").map(Number);
+
+  if (
+    !Number.isFinite(firstHour) ||
+    !Number.isFinite(firstMinute) ||
+    !Number.isFinite(secondHour) ||
+    !Number.isFinite(secondMinute)
+  ) {
+    return null;
+  }
+
+  return Math.abs((firstHour * 60 + firstMinute) - (secondHour * 60 + secondMinute));
 }
 
 function betterEvent(existing, newer) {
