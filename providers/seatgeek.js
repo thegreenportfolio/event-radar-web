@@ -16,7 +16,7 @@ export async function searchSeatGeek({ countryCode, city, category, startDate, e
     "venue.city": city,
     "datetime_local.gte": `${safeStartDate}T00:00:00`,
     "datetime_local.lte": `${safeEndDate}T23:59:59`,
-    per_page: "50",
+    per_page: “300",
     sort: "datetime_utc.asc"
   });
 
