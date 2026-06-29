@@ -18,7 +18,10 @@ let currentPage = 1;
 const eventsPerPage = 20;
 
 const cityOptionsByCountry = {
+
   AU: ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Canberra", "Gold Coast"],
+
+  AE: ["Dubai", "Abu Dhabi"],
 
   AT: ["Vienna"],
 
@@ -77,7 +80,12 @@ const cityOptionsByCountry = {
 
   PT: ["Lisbon"],
 
+
   RO: ["Bucharest", "Cluj-Napoca", "Timișoara", "Iași", "Brașov", "Constanța"],
+
+  SG: ["Singapore"],
+
+  ZA: ["Johannesburg", "Cape Town", "Durban", "Pretoria"],
 
   SE: ["Stockholm"],
 
