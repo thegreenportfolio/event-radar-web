@@ -32,7 +32,10 @@ app.get("/api/events", async (req, res) => {
       keyword = ""
     } = req.query;
 
-    const useSeatGeek = countryCode === "US" || countryCode === "CA";
+    const useSeatGeek =
+  countryCode === "US" ||
+  countryCode === "CA" ||
+  countryCode === "GB";
 
     const [ticketmasterEvents, seatGeekEvents] = await Promise.all([
       searchTicketmaster({ countryCode, city, category, startDate, endDate, keyword }),
