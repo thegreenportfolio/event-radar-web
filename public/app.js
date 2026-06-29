@@ -28,14 +28,14 @@ const cityOptionsByCountry = {
   BE: ["Brussels"],
 
   CA: [
-    "Calgary", "Edmonton", "Red Deer", "Lethbridge", "Fort McMurray",
+    "Calgary", "Edmonton", "Red Deer", "Fort McMurray",
     "Vancouver", "Surrey", "Burnaby", "Richmond", "Victoria", "Kelowna", "Abbotsford", "Nanaimo", "Whistler",
     "Winnipeg",
     "Saskatoon", "Regina",
-    "Toronto", "Mississauga", "Brampton", "Hamilton", "Ottawa", "London", "Kitchener", "Waterloo", "Windsor",
+    "Toronto", "Mississauga", "Brampton", "Hamilton", "Ottawa", "London", "Windsor",
     "Markham", "Vaughan", "Richmond Hill", "Oakville", "Burlington", "Oshawa", "Barrie", "Guelph", "Kingston",
     "Niagara Falls", "St. Catharines",
-    "Montreal", "Quebec City", "Laval", "Gatineau", "Sherbrooke", "Trois-Rivières",
+    "Montreal", "Quebec City", "Laval", "Gatineau", "Trois-Rivières",
     "Halifax", "Moncton", "Fredericton", "Saint John", "Charlottetown", "St. John's"
   ],
 
@@ -128,7 +128,7 @@ const cityOptionsByCountry = {
     "Des Moines", "Cedar Rapids", "Iowa City",
     "Little Rock", "Fayetteville",
     "Hartford", "New Haven", "Stamford",
-    "Providence", "Manchester", "Burlington", "Boise", "Honolulu", "Anchorage"
+    "Providence", "Manchester", "Burlington", "Boise", "Honolulu",
   ]
 };
 
