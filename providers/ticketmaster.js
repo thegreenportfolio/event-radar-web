@@ -18,23 +18,114 @@ export async function searchTicketmaster({ countryCode, city, category, startDat
 
   const ticketmasterKeywordCityAliases = {
     MX: {
-      "Mexico City": "Mexico City"
+      "Mexico City": "Mexico City",
+      Guadalajara: "Guadalajara",
+      Monterrey: "Monterrey",
+      Puebla: "Puebla"
+    },
+    IE: {
+      Dublin: "Dublin",
+      Cork: "Cork",
+      Galway: "Galway",
+      Limerick: "Limerick",
+      Waterford: "Waterford",
+      Kilkenny: "Kilkenny"
+    },
+    FR: {
+      Paris: "Paris",
+      Lyon: "Lyon",
+      Marseille: "Marseille",
+      Toulouse: "Toulouse",
+      Nice: "Nice",
+      Nantes: "Nantes",
+      Lille: "Lille",
+      Bordeaux: "Bordeaux",
+      Strasbourg: "Strasbourg"
+    },
+    DE: {
+      Berlin: "Berlin",
+      Hamburg: "Hamburg",
+      Munich: "München",
+      Cologne: "Köln",
+      Frankfurt: "Frankfurt",
+      Düsseldorf: "Düsseldorf",
+      Stuttgart: "Stuttgart",
+      Leipzig: "Leipzig",
+      Dortmund: "Dortmund"
     },
     ES: {
+      Madrid: "Madrid",
+      Barcelona: "Barcelona",
+      Valencia: "Valencia",
       Seville: "Sevilla",
-      Cordoba: "Córdoba",
-      "A Coruña": "La Coruña",
-      Gijon: "Gijón",
       Malaga: "Málaga",
-      "San Sebastian": "San Sebastián"
+      Bilbao: "Bilbao",
+      Zaragoza: "Zaragoza",
+      Alicante: "Alicante",
+      Granada: "Granada",
+      Cordoba: "Córdoba",
+      Murcia: "Murcia",
+      Palma: "Palma",
+      "San Sebastian": "San Sebastián",
+      Pamplona: "Pamplona",
+      Valladolid: "Valladolid",
+      Vigo: "Vigo",
+      "A Coruña": "La Coruña",
+      Santander: "Santander",
+      Oviedo: "Oviedo",
+      Gijon: "Gijón",
+      Tenerife: "Santa Cruz de Tenerife",
+      "Las Palmas": "Las Palmas"
+    },
+    NL: {
+      Amsterdam: "Amsterdam",
+      Rotterdam: "Rotterdam"
+    },
+    SE: {
+      Stockholm: "Stockholm"
+    },
+    DK: {
+      Copenhagen: "Copenhagen"
+    },
+    NO: {
+      Oslo: "Oslo"
+    },
+    AT: {
+      Vienna: "Vienna",
+      Graz: "Graz"
+    },
+    BE: {
+      Brussels: "Brussels",
+      Antwerp: "Antwerp"
+    },
+    CZ: {
+      Prague: "Prague",
+      Brno: "Brno"
+    },
+    FI: {
+      Helsinki: "Helsinki",
+      Tampere: "Tampere"
+    },
+    PL: {
+      Warsaw: "Warsaw",
+      Krakow: "Krakow"
     },
     IT: {
       Rome: "Roma",
       Milan: "Milano",
+      Naples: "Napoli",
+      Turin: "Torino",
       Florence: "Firenze"
     },
     PT: {
       Lisbon: "Lisboa"
+    },
+    CH: {
+      Zurich: "Zurich",
+      Geneva: "Geneva",
+      Basel: "Basel",
+      Lausanne: "Lausanne",
+      Bern: "Bern"
     },
     RO: {
       Bucharest: "Bucuresti",
@@ -157,27 +248,162 @@ function addDays(dateString, days) {
 
 function ticketmasterCityMatches({ eventCity, selectedCity, searchCity, countryCode }) {
   const event = normalizeCityName(eventCity);
-  const selected = normalizeCityName(selectedCity);
-  const search = normalizeCityName(searchCity);
+  const aliases = ticketmasterCityMatchAliases({
+    countryCode,
+    selectedCity,
+    searchCity
+  });
 
-  if (event.includes(selected) || event.includes(search)) {
-    return true;
+  return aliases.some((alias) => {
+    const normalizedAlias = normalizeCityName(alias);
+
+    return (
+      event === normalizedAlias ||
+      event.includes(normalizedAlias) ||
+      normalizedAlias.includes(event)
+    );
+  });
+}
+
+function ticketmasterCityMatchAliases({ countryCode, selectedCity, searchCity }) {
+  const aliases = new Set([selectedCity, searchCity]);
+
+  const cityAliases = {
+    MX: {
+      "Mexico City": [
+        "Mexico",
+        "México",
+        "Ciudad de México",
+        "Ciudad de Mexico",
+        "Mexico City",
+        "México City",
+        "CDMX",
+        "Mexico CDMX",
+        "México CDMX",
+        "Distrito Federal",
+        "D.F.",
+        "DF"
+      ],
+      Guadalajara: [
+        "Guadalajara",
+        "Guadalajara, Jalisco",
+        "Guadalajara Jalisco",
+        "Zapopan"
+      ],
+      Monterrey: [
+        "Monterrey",
+        "Monterrey, Nuevo León",
+        "Monterrey, Nuevo Leon",
+        "Monterrey Nuevo Leon",
+        "Guadalupe",
+        "San Nicolás de los Garza",
+        "San Nicolas de los Garza",
+        "Col. Centro Monterrey"
+      ],
+      Puebla: [
+        "Puebla",
+        "Puebla City"
+      ]
+    },
+    IE: {
+      Dublin: ["Baile Átha Cliath"],
+      Cork: ["Corcaigh"],
+      Galway: ["Gaillimh"],
+      Limerick: ["Luimneach"],
+      Waterford: ["Port Láirge"],
+      Kilkenny: ["Cill Chainnigh"]
+    },
+    FR: {
+      Marseille: ["Marseille", "Marseilles"],
+      Nice: ["Nice"],
+      Strasbourg: ["Strasbourg"]
+    },
+    DE: {
+      Munich: ["München", "Munchen"],
+      Cologne: ["Köln", "Koln"],
+      Frankfurt: ["Frankfurt am Main"],
+      Düsseldorf: ["Dusseldorf", "Duesseldorf"],
+      Nuremberg: ["Nürnberg", "Nurnberg"],
+      Hanover: ["Hannover"]
+    },
+    ES: {
+      Seville: ["Sevilla"],
+      Malaga: ["Málaga"],
+      Cordoba: ["Córdoba"],
+      "San Sebastian": ["San Sebastián", "Donostia", "Donostia-San Sebastián"],
+      "A Coruña": ["La Coruña", "Coruna"],
+      Gijon: ["Gijón"],
+      Tenerife: ["Santa Cruz de Tenerife"]
+    },
+    IT: {
+      Rome: ["Roma"],
+      Milan: ["Milano"],
+      Naples: ["Napoli"],
+      Turin: ["Torino"],
+      Florence: ["Firenze"]
+    },
+    PT: {
+      Lisbon: ["Lisboa"]
+    },
+    CH: {
+      Zurich: ["Zürich", "Zurigo"],
+      Geneva: ["Genève", "Ginevra"],
+      Basel: ["Basle", "Bâle"],
+      Lausanne: ["Lausanne"],
+      Bern: ["Berne"]
+    },
+    AT: {
+      Vienna: ["Wien"],
+      Graz: ["Graz"]
+    },
+    BE: {
+      Brussels: ["Bruxelles", "Brussel"],
+      Antwerp: ["Antwerpen", "Anvers"]
+    },
+    CZ: {
+      Prague: ["Praha"],
+      Brno: ["Brno"]
+    },
+    FI: {
+      Helsinki: ["Helsingfors"],
+      Tampere: ["Tammerfors"]
+    },
+    PL: {
+      Warsaw: ["Warszawa"],
+      Krakow: ["Kraków", "Cracow"]
+    },
+    DK: {
+      Copenhagen: ["København", "Kobenhavn"]
+    },
+    NO: {
+      Oslo: ["Oslo"]
+    },
+    SE: {
+      Stockholm: ["Stockholm"]
+    },
+    NL: {
+      Amsterdam: ["Amsterdam"],
+      Rotterdam: ["Rotterdam"]
+    },
+    RO: {
+      Bucharest: ["București", "Bucuresti"],
+      "Cluj-Napoca": ["Cluj"],
+      "Timișoara": ["Timisoara"],
+      "Iași": ["Iasi"],
+      "Brașov": ["Brasov"],
+      "Constanța": ["Constanta"]
+    }
+  };
+
+  for (const alias of cityAliases[countryCode]?.[selectedCity] || []) {
+    aliases.add(alias);
   }
 
-  if (countryCode === "MX" && selected === "mexico city") {
-    return [
-      "mexico",
-      "ciudad de mexico",
-      "mexico cdmx",
-      "cdmx"
-    ].includes(event);
-  }
-
-  return false;
+  return [...aliases];
 }
 
 function normalizeCityName(value = "") {
-  return value
+  return String(value || "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
